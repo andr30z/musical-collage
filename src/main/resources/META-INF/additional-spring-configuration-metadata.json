@@ -1,0 +1,12 @@
+{"properties": [
+  {
+    "name": "last-fm-api-key",
+    "type": "java.lang.String",
+    "description": "A description for 'last-fm-key'"
+  },
+  {
+    "name": "last-fm-shared-secret",
+    "type": "java.lang.String",
+    "description": "A description for 'last-fm-shared-secret'"
+  }
+]}
