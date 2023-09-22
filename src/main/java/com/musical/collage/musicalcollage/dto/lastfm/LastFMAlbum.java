@@ -1,4 +1,4 @@
-package com.musical.collage.musicalcollage.dto;
+package com.musical.collage.musicalcollage.dto.lastfm;
 
 import java.util.List;
 
