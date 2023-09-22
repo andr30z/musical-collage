@@ -3,10 +3,8 @@ package com.musical.collage.musicalcollage.service;
 import com.musical.collage.musicalcollage.dto.lastfm.LastFMRequestParams;
 import com.musical.collage.musicalcollage.dto.lastfm.LastFMUserTopAlbumsResponse;
 import com.musical.collage.musicalcollage.dto.lastfm.LastFMUserTopTracksResponse;
-import com.musical.collage.musicalcollage.enums.PlatformTypes;
-import java.util.HashMap;
+import com.musical.collage.musicalcollage.exception.BadRequestException;
 import java.util.List;
-import java.util.Map;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +12,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClient.RequestHeadersSpec;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -57,7 +54,7 @@ public class CollageResourcesService {
       "&method=" +
       method +
       "&limit=" +
-      limit
+      limit * limit //5x5, 10x10...
     );
   }
 
@@ -73,12 +70,18 @@ public class CollageResourcesService {
           lastFMRequestParams.user(),
           uri,
           lastFMRequestParams.period(),
-          lastFMRequestParams.size() * lastFMRequestParams.size()
+          lastFMRequestParams.size()
         )
       )
       .accept(MediaType.APPLICATION_JSON)
       .retrieve()
       .bodyToMono(convertToClass)
+      .doOnError(error -> {
+        error.printStackTrace();
+        throw new BadRequestException(
+          "Error getting collage data! Try again later."
+        );
+      })
       .block();
   }
 

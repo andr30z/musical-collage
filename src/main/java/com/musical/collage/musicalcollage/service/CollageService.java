@@ -1,15 +1,20 @@
 package com.musical.collage.musicalcollage.service;
 
-import com.musical.collage.musicalcollage.dto.CollageData;
-import com.musical.collage.musicalcollage.dto.lastfm.LastFMRequestParams;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
+
 import javax.imageio.ImageIO;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
+
+import com.musical.collage.musicalcollage.dto.CollageData;
+import com.musical.collage.musicalcollage.dto.lastfm.LastFMRequestParams;
+import com.musical.collage.musicalcollage.exception.BadRequestException;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
@@ -31,7 +36,7 @@ public class CollageService {
     log.info(
       "Generating lastFM ALBUMS collage for user: {}, with the following links: {}",
       lastFMRequestParams.user(),
-      lastFMCollageData.getAlbumImagesLinks()
+      lastFMCollageData.getImagesLinks()
     );
     return this.createMusicalCollage(
         lastFMCollageData,
@@ -49,7 +54,7 @@ public class CollageService {
     log.info(
       "Generating lastFM TRACKS collage for user: {}, with the following links: {}",
       lastFMRequestParams.user(),
-      lastFMCollageData.getAlbumImagesLinks()
+      lastFMCollageData.getImagesLinks()
     );
     return this.createMusicalCollage(
         lastFMCollageData,
@@ -74,17 +79,17 @@ public class CollageService {
     try {
       List<byte[]> allImagesDownloaded =
         this.collageResourcesService.downloadAllImagesFromLinks(
-            collageData.getAlbumImagesLinks()
+            collageData.getImagesLinks()
           );
       return mergeCollageImages(
         allImagesDownloaded,
         collage,
         COLLAGE_ALBUM_COVER_AVERAGE_SIZE
       );
-    } catch (IOException e) {
+    } catch (Exception e) {
       e.printStackTrace();
     }
-    return collage;
+     throw new BadRequestException("Error generating musical collage! Try again later.");
   }
 
   private BufferedImage mergeCollageImages(
@@ -100,7 +105,6 @@ public class CollageService {
 
       BufferedImage albumCoverImage = ImageIO.read(inputStream);
       collageGraphics.drawImage(albumCoverImage, x, y, null);
-      // log.info("X = {}, Y = {}, CollageWidth = {}", x, y, collage.getWidth());
       x += collageImageSize;
       if (x >= collage.getWidth()) {
         x = 0;
