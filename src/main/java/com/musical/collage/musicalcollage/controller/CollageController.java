@@ -29,6 +29,6 @@ public class CollageController {
   public BufferedImage generateLastFMTracksCollage(
     LastFMRequestParams lastFMRequestParams
   ) {
-    return this.collageService.generateLastFMAlbumsCollage(lastFMRequestParams);
+    return this.collageService.generateLastFMTracksCollage(lastFMRequestParams);
   }
 }

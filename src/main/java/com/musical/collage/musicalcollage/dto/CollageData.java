@@ -9,14 +9,14 @@ import java.util.stream.Stream;
 
 public class CollageData {
 
-  private final List<String> albumImagesLinks;
+  private final List<String> imagesLinks;
 
-  public CollageData(List<String> albumImagesLinks) {
-    this.albumImagesLinks = albumImagesLinks;
+  public CollageData(List<String> imagesLinks) {
+    this.imagesLinks = imagesLinks;
   }
 
-  public List<String> getAlbumImagesLinks() {
-    return albumImagesLinks;
+  public List<String> getImagesLinks() {
+    return imagesLinks;
   }
 
   record ImageUrls(List<LastFMImage> images) {}
