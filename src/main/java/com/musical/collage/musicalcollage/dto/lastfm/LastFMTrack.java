@@ -2,6 +2,8 @@ package com.musical.collage.musicalcollage.dto.lastfm;
 
 import java.util.List;
 
+import com.musical.collage.musicalcollage.dto.CollageImage;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,5 +13,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class LastFMTrack {
     private String name;
-    private List<LastFMImage> image;
+    private List<CollageImage> image;
 }

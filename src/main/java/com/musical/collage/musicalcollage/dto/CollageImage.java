@@ -1,6 +1,6 @@
-package com.musical.collage.musicalcollage.dto.lastfm;
+package com.musical.collage.musicalcollage.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonAlias;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,10 +9,11 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LastFMImage {
+public class CollageImage {
 
+  @JsonAlias({"size", "width"})
   private String size;
 
-  @JsonProperty("#text")
+  @JsonAlias({"#text", "url"})
   private String imageLink;
 }

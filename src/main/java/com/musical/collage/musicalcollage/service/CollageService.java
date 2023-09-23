@@ -1,26 +1,25 @@
 package com.musical.collage.musicalcollage.service;
 
+import com.musical.collage.musicalcollage.dto.CollageData;
+import com.musical.collage.musicalcollage.dto.lastfm.LastFMRequestParams;
+import com.musical.collage.musicalcollage.dto.spotify.SpotifyRequestParams;
+import com.musical.collage.musicalcollage.exception.BadRequestException;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
-
 import javax.imageio.ImageIO;
-
-import org.springframework.stereotype.Service;
-
-import com.musical.collage.musicalcollage.dto.CollageData;
-import com.musical.collage.musicalcollage.dto.lastfm.LastFMRequestParams;
-import com.musical.collage.musicalcollage.exception.BadRequestException;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
 public class CollageService {
 
   private final CollageResourcesService collageResourcesService;
+  private static final int LASTFM_COLLAGE_ALBUM_COVER_AVERAGE_SIZE = 174;
+  private static final int SPOTIFY_COLLAGE_ALBUM_COVER_AVERAGE_SIZE = 174;
 
   public CollageService(CollageResourcesService collageResourcesService) {
     this.collageResourcesService = collageResourcesService;
@@ -40,6 +39,7 @@ public class CollageService {
     );
     return this.createMusicalCollage(
         lastFMCollageData,
+        LASTFM_COLLAGE_ALBUM_COVER_AVERAGE_SIZE,
         lastFMRequestParams.size()
       );
   }
@@ -58,18 +58,37 @@ public class CollageService {
     );
     return this.createMusicalCollage(
         lastFMCollageData,
+        LASTFM_COLLAGE_ALBUM_COVER_AVERAGE_SIZE,
         lastFMRequestParams.size()
+      );
+  }
+
+  public BufferedImage generateSpotifyTracksCollage(
+    SpotifyRequestParams spotifyRequestParams
+  ) {
+    CollageData spotifyCollageData = CollageData.toCollageData(
+      this.collageResourcesService.getUserSpotifyTopTracks(spotifyRequestParams),
+      spotifyRequestParams.size()
+    );
+    log.info(
+      "Generating Spotify TRACKS collage with the following links: {}",
+      spotifyCollageData.getImagesLinks()
+    );
+    return this.createMusicalCollage(
+        spotifyCollageData,
+        SPOTIFY_COLLAGE_ALBUM_COVER_AVERAGE_SIZE,
+        spotifyRequestParams.size()
       );
   }
 
   private BufferedImage createMusicalCollage(
     CollageData collageData,
-    int size
+    int collageItemCoverAverageSize,
+    int collageGridQuantity
   ) {
-    final int COLLAGE_ALBUM_COVER_AVERAGE_SIZE = 174;
     final int COLLAGE_WIDTH =
-      COLLAGE_ALBUM_COVER_AVERAGE_SIZE * size, COLLAGE_HEIGHT =
-      COLLAGE_ALBUM_COVER_AVERAGE_SIZE * size;
+      collageItemCoverAverageSize * collageGridQuantity, COLLAGE_HEIGHT =
+      collageItemCoverAverageSize * collageGridQuantity;
 
     BufferedImage collage = new BufferedImage(
       COLLAGE_WIDTH,
@@ -84,12 +103,14 @@ public class CollageService {
       return mergeCollageImages(
         allImagesDownloaded,
         collage,
-        COLLAGE_ALBUM_COVER_AVERAGE_SIZE
+        collageItemCoverAverageSize
       );
     } catch (Exception e) {
       e.printStackTrace();
     }
-     throw new BadRequestException("Error generating musical collage! Try again later.");
+    throw new BadRequestException(
+      "Error generating musical collage! Try again later."
+    );
   }
 
   private BufferedImage mergeCollageImages(
